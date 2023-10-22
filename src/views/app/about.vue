@@ -45,7 +45,7 @@ function getData() {
         if (!resData[year]) {
             resData[year] = [{ month, data: [{ day, time }] }]
         } else {
-            const findMonthIdx = resData[year].find(i => i.month === month)
+            const findMonthIdx = resData[year].findIndex(i => i.month === month)
             if (findMonthIdx === -1) {
                 resData[year].push({ month, data: [{ day, time }] })
             } else {
