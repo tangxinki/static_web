@@ -1,35 +1,123 @@
 <template>
-    <div draggable="true" class="drag flex justify-end">
-        <div class="w-2">123123</div>
+    <div>
+        <div v-show="islock" class=" p-6">
+            <van-button type="success" @click="showTop = true">{{ dateVal }}</van-button>
+            <div>{{ state.month }}月共打卡{{ state.thisMonthData }}次，相比上个月{{ state.reduce > 0 ? '多' : '少' }}了{{
+                Math.abs(state.reduce) }}次
+            </div>
+            <div>
+                <p>年度数据：</p>
+                <p>{{ state.year }}年共打卡{{ state.thisYearLen }}次，打卡最多的月份是{{ state.maxMonth }}月，{{ state.maxMonthTimes
+                }}次，最少的月份是{{ state.minMonth }}月，{{ state.minMonthTimes }}次。</p>
+                <p>最常打卡的时间是在{{ state.alawaysHour }}点</p>
+                <p>去年共打卡{{ state.prevYearLen }}次，今年相比去年增幅{{ state.rate }}%</p>
+            </div>
+        </div>
+        <van-popup v-model:show="showTop" position="bottom" :style="{ height: '37%' }">
+            <van-date-picker @cancel="showTop = false" @confirm="confirm" v-model="currentDate" title="选择年月"
+                :min-date="new Date(2023, 10, 1)" :columns-type="['year', 'month']" />
+        </van-popup>
     </div>
-    <!-- <van-uploader v-model="state.fileList" multiple :after-read="afterRead" /> -->
-    <div id="drop" style="width: 250px;height: 250px;border: 1px solid #ccc;">拖动到此处</div>
 </template>
 
-<script  setup>
-const state = reactive({ fileList: [] })
-onMounted(() => {
-    listenImg()
+<script setup>
+import { formatDate } from '@/utils';
+import { useLocalStorage } from '@vueuse/core'
+import { func } from 'vue-types';
+
+const showTop = ref(false)
+const dateVal = ref(formatDate(new Date(), 'YYYY-mm'))
+const stock = useLocalStorage('dateStock', {})
+const currentDate = ref(['2023', '02']);
+
+const islock = useLocalStorage('islock', false)
+const state = reactive({
+    prevYearLen: 0,
+    reduce: 0
 })
-function afterRead() {
-    nextTick(listenImg)
+const resData = {}, hourData = {}
+function getData() {
+    Object.entries(stock.value).forEach(([date, time]) => {
+        const [year, month, day] = date.split('-')
+        const [hour] = time.split(':')
+        if (!hourData[hour]) hourData[hour] = 1
+        hourData[hour] = hourData[hour] ? hourData[hour] + 1 : 1
+        if (!resData[year]) {
+            resData[year] = [{ month, data: [{ day, time }] }]
+        } else {
+            const findMonthIdx = resData[year].find(i => i.month === month)
+            if (findMonthIdx === -1) {
+                resData[year].push({ month, data: [{ day, time }] })
+            } else {
+                resData[year][findMonthIdx].data.push({ day, time })
+            }
+        }
+    })
 }
-function listenImg() {
-    // const drag = document.querySelector('.van-uploader__preview')
-    const drag = document.querySelector('.drag')
-    drag.addEventListener("dragstart", function (event) {
-        event.dataTransfer.setData("text", event.target.id);
-    });
-
-    drop.addEventListener("dragover", function (event) {
-        event.preventDefault();
-    });
-
-    drop.addEventListener("drop", function (event) {
-        event.preventDefault();
-        var data = event.dataTransfer.getData("text");
-        var draggedElement = document.getElementById(data);
-        drop.appendChild(draggedElement);
-    });
+function confirm(e) {
+    const res = e.selectedValues.join('-')
+    dateVal.value = res
+    showTop.value = false
+    statistics(res)
 }
+
+function statistics(nowDate = formatDate(new Date(), 'YYYY-mm-dd')) {
+    const year = new Date(nowDate).getFullYear()
+    const month = new Date(nowDate).getMonth() + 1;
+    const date = new Date(nowDate).getDate();
+    state.year = year
+    state.month = month
+    // let thisMonthData
+    const resDataObject = resData[year] || []
+    const res = resDataObject.find(i => +i.month === month) || {}
+    const thisMonthData = res.data?.length || 0
+    const prevMonth = month - 1 === 0 ? '12' : month - 1
+    const res2 = resDataObject.find(i => +i.month === prevMonth) || {}
+    const prevMonthData = res2.data?.length || 0
+    // 当月与上月差值
+    state.reduce = thisMonthData - prevMonthData
+    state.thisMonthData = thisMonthData
+    state.prevMonthData = prevMonthData
+    let thisYearLen = 0, maxMonthTimes = 0, maxMonth = 'None', minMonthTimes = 0, minMonth = 'None'
+    resDataObject.forEach((item, i) => {
+        thisYearLen += item.data.length
+        if (item.data.length > maxMonthTimes) {
+            maxMonthTimes = item.data.length
+            maxMonth = item.month
+        }
+        if (i === 0) {
+            minMonth = item.month
+            minMonthTimes = item.data.length
+        } else if (minMonthTimes > item.data.length) {
+            minMonthTimes = item.data.length
+            minMonth = item.month
+        }
+
+    })
+    let prevYearLen = 0
+    if (resData[year - 1]) {
+        resData[year - 1].forEach(item => {
+            prevYearLen += item.data.length
+        })
+        state.prevYearLen = prevYearLen
+    }
+    state.rate = prevYearLen === 0 ? '100' : Math.ceil((thisYearLen - prevYearLen) / prevYearLen * 100)
+    // let alawaysHour
+    const [alaways] = Object.entries(hourData)
+        .map(([hour, times]) => ({ hour, times }))
+        .sort((a, b) => b.times - a.times)
+    state.alawaysHour = alaways ? alaways.hour : 'None'
+    state.thisYearLen = thisYearLen
+    state.maxMonth = maxMonth
+    state.maxMonthTimes = maxMonthTimes
+    state.minMonth = minMonth
+    state.minMonthTimes = minMonthTimes
+
+}
+function bootstrap() {
+    if (!islock.value) return
+    getData()
+    statistics()
+}
+onMounted(bootstrap)
 </script>

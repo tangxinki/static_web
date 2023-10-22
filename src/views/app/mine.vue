@@ -1,6 +1,6 @@
 <template>
   <div>
-    <van-field v-show="!islock" class=" mt-2" v-model="value" border type="password" label="密码" @blur="blur" />
+    <van-field v-show="!islock" class=" mt-2" v-model="value" border type="text" label="密码" @blur="blur" />
     <div v-show="islock" class="fux relative">
       <el-calendar class="caler" v-model="dateVal" ref="calendar">
         <template #header="{ date }">

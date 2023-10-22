@@ -10,7 +10,7 @@
                 </div>
             </template>
         </van-uploader>
-        <van-button type="primary" :loading="loading">主要按钮</van-button>
+        <van-button type="primary" :loading="false">主要按钮</van-button>
     </div>
 </template>
 <script setup>
