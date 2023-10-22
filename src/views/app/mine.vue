@@ -107,6 +107,22 @@ function formatter(day) {
 function blur(e) {
   islock.value = e.target.value === '0419'
 }
+
+onMounted(() => {
+  // function merge11(nums1, m, nums2, n) {
+  //   let i = nums1.length - 1;
+  //   m--;
+  //   n--;
+  //   while (n >= 0) {
+  //     while (m >= 0 && nums1[m] > nums2[n]) {
+  //       nums1[i--] = nums1[m--];
+  //     }
+  //     nums1[i--] = nums2[n--];
+  //   }
+  //   console.log(nums1);
+  // }
+  // merge11([1, 2, 3, 0, 0, 0], 3, [2, 5, 6], 3)
+})
 </script>
 <style lang="scss" scoped>
 :deep(.caler) {
