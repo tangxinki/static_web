@@ -30,7 +30,7 @@
         </template>
       </el-calendar>
       <van-button type="success" class="btn" v-show="isShowBtn" @click="handleClockIn">
-        {{ formateDateVal }} 冲了打卡
+        {{ formateDateVal }} 打卡
       </van-button>
     </div>
     <van-popup v-model:show="showTop" position="bottom" :style="{ height: '37%' }">
