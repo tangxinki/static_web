@@ -27,21 +27,3 @@ export function findTreeId(list: Recordable[], id: string | number, options?: tr
     }
     return processTree(list, id)
 }
-
-let list = [
-    {
-        id: '1',
-        children: [{ id: '1.1' }, { id: '1.2' }, { id: '1.3' }, { id: '1.4' }]
-    },
-    {
-        id: '2',
-        children: [{ id: '2.1' }, { id: '2.2' }, { id: '2.3' }, { id: '2.4' }]
-    },
-    {
-        id: '3',
-        children: [{ id: '3.1' }, { id: '3.2' }, { id: '3.3' }, { id: '3.4' }]
-    }
-]
-
-const a = findTreeId(list, '3.2')
-console.log('💨💨💨 ~ a:', a)

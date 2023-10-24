@@ -12,6 +12,7 @@
                 <p>最常打卡的时间是在{{ state.alawaysHour }}点</p>
                 <p>去年共打卡{{ state.prevYearLen }}次，今年相比去年增幅{{ state.rate }}%</p>
             </div>
+            <div class="chart w-[90vw] h-[50vh]"></div>
         </div>
         <van-popup v-model:show="showTop" position="bottom" :style="{ height: '37%' }">
             <van-date-picker @cancel="showTop = false" @confirm="confirm" v-model="currentDate" title="选择年月"
@@ -23,13 +24,14 @@
 <script setup>
 import { formatDate } from '@/utils';
 import { useLocalStorage } from '@vueuse/core'
-import { func } from 'vue-types';
-
+import * as echarts from 'echarts';
+import { utilToChinesNum } from '@/utils/num'
 const showTop = ref(false)
 const dateVal = ref(formatDate(new Date(), 'YYYY-mm'))
 const stock = useLocalStorage('dateStock', {})
 const currentDate = ref(['2023', '02']);
-
+const monthList = ref([])
+const chartDate = ref({})
 const islock = useLocalStorage('islock', false)
 const state = reactive({
     prevYearLen: 0,
@@ -53,12 +55,20 @@ function getData() {
             }
         }
     })
+    Object.entries(resData).forEach(([year, data]) => {
+        const res = new Array(12).fill(0).map((_, i) => {
+            const a = data.find(k => +k.month === i + 1)
+            return a ? a.data.length : 0
+        })
+        chartDate.value[year] = res
+    })
 }
 function confirm(e) {
     const res = e.selectedValues.join('-')
     dateVal.value = res
     showTop.value = false
     statistics(res)
+    renderChart()
 }
 
 function statistics(nowDate = formatDate(new Date(), 'YYYY-mm-dd')) {
@@ -112,12 +122,40 @@ function statistics(nowDate = formatDate(new Date(), 'YYYY-mm-dd')) {
     state.maxMonthTimes = maxMonthTimes
     state.minMonth = minMonth
     state.minMonthTimes = minMonthTimes
+}
 
+function renderChart() {
+    const chartDom = document.querySelector('.chart');
+    const myChart = echarts.init(chartDom);
+    const option = {
+        xAxis: {
+            type: 'category',
+            data: monthList.value
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [
+            {
+                data: chartDate.value[currentDate.value[0]] || [],
+                type: 'bar',
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c}', // 显示数据值
+                },
+            }
+        ]
+    };
+    option && myChart.setOption(option);
+    window.addEventListener('resize', myChart.resize)
 }
 function bootstrap() {
     if (!islock.value) return
     getData()
     statistics()
+    monthList.value = new Array(12).fill(0).map((_, i) => utilToChinesNum(i + 1) + '月')
+    renderChart()
 }
 onMounted(bootstrap)
 </script>
