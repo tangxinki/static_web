@@ -154,7 +154,7 @@ function bootstrap() {
     if (!islock.value) return
     getData()
     statistics()
-    monthList.value = new Array(12).fill(0).map((_, i) => utilToChinesNum(i + 1) + '月')
+    monthList.value = new Array(12).fill(0).map((_, i) => i + 1 + '月')
     renderChart()
 }
 onMounted(bootstrap)
