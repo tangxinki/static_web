@@ -1,4 +1,4 @@
-import { formatDate } from '../../utils';
+import { formatDate } from '@/utils';
 import { useLocalStorage } from '@vueuse/core'
 import { ref, reactive } from 'vue'
 import * as echarts from 'echarts';

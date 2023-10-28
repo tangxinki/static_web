@@ -1,6 +1,6 @@
 import type { BlobFile } from '#/utils'
 import { isObject } from './is'
-// import { getDicts } from '@/api/modules/common'
+import { getDicts } from '@/api/modules/common'
 
 
 /**
