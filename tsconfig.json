@@ -52,6 +52,7 @@
     "mock/**/*.ts",
     "vite.config.ts",
     "*.d.ts",
+    "src/views/app/about.js",
   ],
   "exclude": [
     "dist",
