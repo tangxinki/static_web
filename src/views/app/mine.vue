@@ -46,8 +46,7 @@ import { defaultWindow, useLocalStorage } from '@vueuse/core'
 import { dateEquals } from 'element-plus';
 import { showToast } from 'vant';
 // import {ElButton} from 'element-plus'
-import { ref } from 'vue'
-import { func } from 'vue-types';
+import { ref, computed, onMounted } from 'vue'
 // import { Icon } from '@/components'
 const islock = useLocalStorage('islock', false)
 const dateStock = useLocalStorage('dateStock', {})
@@ -67,7 +66,6 @@ const isShowBtn = computed(() => {
   const date = new Date(dateVal.value).getDate();
   return (month < nowMonth || (month === nowMonth && date <= nowDate)) && !dateStock.value[formateDateVal.value]
 })
-console.log('💨💨💨 ~ today:', today)
 function confirm(e) {
   dateVal.value = new Date(e.selectedValues.join('-') + '-01')
   showTop.value = false
@@ -85,9 +83,10 @@ function handleClockIn() {
 
 function formatter(day) {
   const month = day.date.getMonth() + 1;
+  console.log('💨💨💨 ~ month:', month)
   const date = day.date.getDate();
   const nowDate = new Date().getDate(), nowMonth = new Date().getMonth() + 1
-  if (month === 2) {
+  if (month === 3) {
     if (date === 1) {
       day.topInfo = '劳动节';
     } else if (date === nowDate) {
