@@ -83,7 +83,6 @@ function handleClockIn() {
 
 function formatter(day) {
   const month = day.date.getMonth() + 1;
-  console.log('💨💨💨 ~ month:', month)
   const date = day.date.getDate();
   const nowDate = new Date().getDate(), nowMonth = new Date().getMonth() + 1
   if (month === 3) {
