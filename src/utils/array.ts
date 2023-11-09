@@ -1,3 +1,4 @@
+import { Fn } from '@vueuse/core'
 import { treeOptions } from './types'
 
 
@@ -26,4 +27,17 @@ export function findTreeId(list: Recordable[], id: string | number, options?: tr
         return null
     }
     return processTree(list, id)
+}
+
+export function register() {
+    // @ts-ignore
+    Array.prototype.filterMap = function (callbackFn1: AnyFn, callbackFn2: AnyFn) {
+        const target = []
+        for (let i = 0; i < this.length; i++) {
+            const item = this[i]
+            const res = callbackFn1(item, i, this)
+            if (res) target.push(callbackFn2(item, i, this))
+        }
+        return target
+    }
 }
