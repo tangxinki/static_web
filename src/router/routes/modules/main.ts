@@ -26,7 +26,25 @@ const PAGE_MAIN_ROUTE: AppRouteRecordRaw = {
             title: '测试',
             ignoreAuth: true
         },
-    }
+    },
+    {
+        path: '/main/canvas',
+        name: 'canvas',
+        component: () => import('@/views/app/canvas.vue'),
+        meta: {
+            title: '测试',
+            ignoreAuth: true
+        },
+    },
+    {
+        path: '/main/testx',
+        name: 'canvas',
+        component: () => import('@/views/app/dashbord.vue'),
+        meta: {
+            title: '测试',
+            ignoreAuth: true
+        },
+    },
     ]
 };
 
